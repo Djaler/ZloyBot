@@ -1,3 +1,4 @@
+from peewee import PeeweeException
 from telegram.ext import CommandHandler
 
 from model import database
@@ -36,16 +37,26 @@ class Admin:
         message = update.message
         if message.from_user.id == self._admin_id:
             text = ' '.join(args)
-            result = database.execute_sql(text).fetchall()
-            if text.startswith('select'):
-                if result:
-                    text = '\n'.join('{0}. {1}'.format(index + 1, ' - '.join(
-                        str(el) for el in row)) for index, row in
-                                     enumerate(result))
-                else:
-                    text = 'Нет результатов'
-                bot.sendMessage(chat_id=message.chat_id, text=text,
+            database.begin()
+            try:
+                result = database.execute_sql(text)
+            except PeeweeException as ex:
+                database.rollback()
+                bot.sendMessage(chat_id=message.chat_id, text=ex,
                                 reply_to_message_id=message.message_id)
+            else:
+                if text.startswith('select'):
+                    result = result.fetchall()
+                    database.commit()
+                    if result:
+                        text = '\n'.join(
+                            '{0}. {1}'.format(index + 1, ' - '.join(
+                                str(el) for el in row)) for index, row in
+                            enumerate(result))
+                    else:
+                        text = 'Нет результатов'
+                    bot.sendMessage(chat_id=message.chat_id, text=text,
+                                    reply_to_message_id=message.message_id)
         else:
             bot.sendMessage(chat_id=message.chat_id, text='NIET',
                             reply_to_message_id=message.message_id)

@@ -38,10 +38,13 @@ class Statistic:
         
         if message.chat_id not in (self._chat_id, self._admin_id):
             return
-        
-        user, created = User.get_or_create(user_id=message.from_user.id)
-        
-        if created:
+
+        user, created = User.get_or_create(user_id=message.from_user.id,
+                                           defaults={
+                                               'username':
+                                                   message.from_user.username})
+
+        if not user.user_messages_info.exists():
             bot.sendMessage(chat_id=message.chat_id,
                             reply_to_message_id=message.message_id,
                             text='Ты не писал ещё ничего, алло')
