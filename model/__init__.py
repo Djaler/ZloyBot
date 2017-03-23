@@ -11,9 +11,10 @@ database = PostgresqlDatabase(url.path[1:], user=url.username,
 
 from model.user import User
 from model.user_messages_info import UserMessagesInfo
+from model.feed import Feed
 
 
 def init_database():
     database.connect()
     database.create_tables(
-        [User, UserMessagesInfo], True)
+        [User, UserMessagesInfo, Feed], True)
