@@ -39,29 +39,32 @@ class ResolveTestCase(unittest.TestCase):
     def test_empty_variants(self):
         args = []
         resolve(self.bot, self.update, args)
-        
-        self.bot.sendMessage.assert_called_once_with(chat_id=self.chat_id,
-                                                     reply_to_message_id=self.update.message.message_id,
-                                                     text='Ну а где варианты?')
+
+        self.bot.sendMessage.assert_called_once_with(
+            chat_id=self.chat_id,
+            reply_to_message_id=self.update.message.message_id,
+            text='Ну а где варианты?')
     
     def test_one_variant(self):
         variants = ['1', '1']
         args = ['/'.join(variants)]
         resolve(self.bot, self.update, args)
-        
-        self.bot.sendMessage.assert_called_once_with(chat_id=self.chat_id,
-                                                     reply_to_message_id=self.update.message.message_id,
-                                                     text='Эмм, тут так-то '
-                                                          'один вариант...')
+
+        self.bot.sendMessage.assert_called_once_with(
+            chat_id=self.chat_id,
+            reply_to_message_id=self.update.message.message_id,
+            text='Эмм, тут так-то '
+                 'один вариант...')
         
         variants = ['1']
         args = ['/'.join(variants)]
         resolve(self.bot, self.update, args)
-        
-        self.bot.sendMessage.assert_called_with(chat_id=self.chat_id,
-                                                reply_to_message_id=self.update.message.message_id,
-                                                text='Эмм, тут так-то '
-                                                     'один вариант...')
+
+        self.bot.sendMessage.assert_called_with(
+            chat_id=self.chat_id,
+            reply_to_message_id=self.update.message.message_id,
+            text='Эмм, тут так-то '
+                 'один вариант...')
 
 
 if __name__ == '__main__':
