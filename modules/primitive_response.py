@@ -1,3 +1,4 @@
+import re
 from random import choice
 
 from telegram.ext import CommandHandler, Filters, MessageHandler
@@ -10,18 +11,12 @@ class PrimitiveResponse:
     def add_handlers(self, add_handler):
         add_handler(MessageHandler(Filters.text, self._run))
         add_handler(CommandHandler('me', self._me, pass_args=True))
-    
-    @staticmethod
-    def _run(bot, update):
-        def choice_variant_from_file(file_name):
-            with open('modules/responses/%s' % file_name) as file:
-                variant = choice(file.read().splitlines())
-            return variant
-        
-        def text_response(collocations, answer):
-            if any(collocation in text for collocation in collocations):
+
+    def _run(self, bot, update):
+        def text_response(patterns, answer):
+            if any(re.search(pattern, text) for pattern in patterns):
                 if answer.endswith('.txt'):
-                    answer = choice_variant_from_file(answer)
+                    answer = self._choice_variant_from_file(answer)
                 bot.sendMessage(chat_id=chat_id, text=answer,
                                 reply_to_message_id=message_id,
                                 markdown_support=True)
@@ -37,9 +32,9 @@ class PrimitiveResponse:
         text_response(['спать', 'посплю'], 'snov.txt')
         
         text_response(['бот злой'], 'Ты не лучше.')
-        
-        text_response(['иди нахуй', 'нахуй пошел', 'нахуй иди', 'пошел нахуй'],
-                      'nahui.txt')
+    
+        text_response({r'иди на ?хуй', r'на ?хуй пошел', r'на ?хуй иди',
+                       r'пошел на ?хуй'}, 'nahui.txt')
         
         text_response(['бот пидор', 'бот идиот', 'бот мудак'], 'И?')
         
@@ -61,3 +56,9 @@ class PrimitiveResponse:
         
         text = "{0} {1}".format(message.from_user.username, ' '.join(args))
         bot.sendMessage(chat_id=self._chat_id, text=text)
+
+    @staticmethod
+    def _choice_variant_from_file(file_name):
+        with open('modules/responses/%s' % file_name) as file:
+            variant = choice(file.read().splitlines())
+        return variant
