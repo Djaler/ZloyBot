@@ -10,10 +10,10 @@ class Statistic:
     
     def add_handlers(self, add_handler):
         add_handler(MessageHandler(Filters.text, self._update_statistic))
-        add_handler(CommandHandler('top10_messages', self._top10_messages))
+        add_handler(CommandHandler('top10', self._top10))
         add_handler(CommandHandler('statistic', self._display_statistic))
-    
-    def _top10_messages(self, bot, update):
+
+    def _top10(self, bot, update):
         message = update.message
         
         if message.chat_id not in (self._chat_id, self._admin_id):
