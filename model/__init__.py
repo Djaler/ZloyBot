@@ -1,13 +1,19 @@
-import os
 import urllib.parse
 
-from peewee import PostgresqlDatabase
+from settings import DATABASE_URL, ENV
 
-urllib.parse.uses_netloc.append("postgres")
-url = urllib.parse.urlparse(os.environ["DATABASE_URL"])
-database = PostgresqlDatabase(url.path[1:], user=url.username,
-                              password=url.password, host=url.hostname,
-                              port=url.port)
+if ENV == "prod":
+    from peewee import PostgresqlDatabase
+    
+    urllib.parse.uses_netloc.append("postgres")
+    url = urllib.parse.urlparse(DATABASE_URL)
+    database = PostgresqlDatabase(url.path[1:], user=url.username,
+                                  password=url.password, host=url.hostname,
+                                  port=url.port)
+else:
+    from peewee import SqliteDatabase
+    
+    database = SqliteDatabase(DATABASE_URL)
 
 from model.user import User
 from model.user_messages_info import UserMessagesInfo

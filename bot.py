@@ -1,10 +1,9 @@
 import logging
-import os
 import traceback
 
 from telegram import ParseMode, TelegramError
-from telegram.ext import CommandHandler, Dispatcher, Filters, MessageHandler, \
-    Updater
+from telegram.ext import (CommandHandler, Dispatcher, Filters, MessageHandler,
+                          Updater)
 
 from model import init_database
 from modules.admin import Admin
@@ -14,6 +13,7 @@ from modules.primitive_response import PrimitiveResponse
 from modules.random_reaction import random_reaction
 from modules.resolve import resolve
 from modules.statistic import Statistic
+from settings import ADMIN_ID, CHAT_ID, ENV, PORT, TOKEN, URL
 
 
 def process_update(obj, update):
@@ -36,13 +36,10 @@ def process_update(obj, update):
 
 
 class Bot:
-    def __init__(self, token, chat_id, admin_id):
+    def __init__(self):
         Dispatcher.process_update = process_update
-        
-        self._token = token
-        self._updater = Updater(token)
-        self._chat_id = int(chat_id)
-        self._admin_id = int(admin_id)
+
+        self._updater = Updater(TOKEN)
         
         init_database()
         self._init_handlers()
@@ -51,24 +48,25 @@ class Bot:
         logging.basicConfig(format=log_format, level=logging.WARNING)
     
     def run(self):
-        port = int(os.environ.get('PORT', '5000'))
-        self._updater.start_webhook(listen='0.0.0.0', port=port,
-                                    url_path=self._token)
-        self._updater.bot.set_webhook(os.environ.get("URL") +
-                                      self._token)
-        self._updater.idle()
+        if ENV == "prod":
+            self._updater.start_webhook(listen='0.0.0.0', port=PORT,
+                                        url_path=TOKEN)
+            self._updater.bot.set_webhook(URL + TOKEN)
+            self._updater.idle()
+        else:
+            self._updater.start_polling(poll_interval=1)
     
     def _init_handlers(self):
         self._updater.dispatcher.add_handler(
             MessageHandler(Filters.all, random_reaction))
 
-        statistic = Statistic(self._chat_id, self._admin_id)
+        statistic = Statistic(CHAT_ID, ADMIN_ID)
         statistic.add_handlers(self._updater.dispatcher.add_handler)
 
-        forward = Forward(self._chat_id, self._admin_id)
+        forward = Forward(CHAT_ID, ADMIN_ID)
         forward.add_handlers(self._updater.dispatcher.add_handler)
 
-        kto_zloy = KtoZloy(self._chat_id, self._admin_id)
+        kto_zloy = KtoZloy(CHAT_ID, ADMIN_ID)
         kto_zloy.add_handlers(self._updater.dispatcher.add_handler)
 
         self._updater.dispatcher.add_handler(
@@ -76,10 +74,10 @@ class Bot:
         self._updater.dispatcher.add_handler(
             CommandHandler('r', resolve, pass_args=True))
 
-        admin = Admin(self._chat_id, self._admin_id)
+        admin = Admin(CHAT_ID, ADMIN_ID)
         admin.add_handlers(self._updater.dispatcher.add_handler)
 
-        primitive_response = PrimitiveResponse(self._chat_id)
+        primitive_response = PrimitiveResponse(CHAT_ID)
         primitive_response.add_handlers(self._updater.dispatcher.add_handler)
         
         self._updater.dispatcher.add_error_handler(self._error)
@@ -102,5 +100,10 @@ class Bot:
         text = parse_dict(update.to_dict(),
                           1) + '\n\n' + traceback.format_exc()
         logging.warning(text)
-        bot.send_message(chat_id=self._admin_id, text='```' + text + '```',
+        bot.send_message(chat_id=ADMIN_ID, text='```' + text + '```',
                          parse_mode=ParseMode.MARKDOWN)
+
+
+if __name__ == '__main__':
+    bot = Bot()
+    bot.run()

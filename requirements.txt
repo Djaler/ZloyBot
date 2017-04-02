@@ -3,3 +3,4 @@ peewee
 psycopg2
 feedparser
 python-dateutil
+python-dotenv

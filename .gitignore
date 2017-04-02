@@ -1,14 +1,9 @@
-# Byte-compiled files
 __pycache__/
 
-# PyCharm files
 .idea/
 
-#Database
 *.db
 
-#Virtualenv directory
 venv/
 
-# Log files
-*.log
+.env
