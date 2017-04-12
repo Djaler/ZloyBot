@@ -1,5 +1,5 @@
 import re
-from random import choice
+from random import choice, randint
 
 from telegram.ext import CommandHandler, Filters, MessageHandler
 
@@ -13,13 +13,15 @@ class PrimitiveResponse:
         add_handler(CommandHandler('me', self._me, pass_args=True))
 
     def _run(self, bot, update):
-        def text_response(patterns, answer):
+        def text_response(patterns, answer, chance=100):
             if any(re.search(pattern, text) for pattern in patterns):
                 if answer.endswith('.txt'):
                     answer = self._choice_variant_from_file(answer)
-                bot.sendMessage(chat_id=chat_id, text=answer,
-                                reply_to_message_id=message_id,
-                                markdown_support=True)
+
+                if randint(1, 100) <= chance:
+                    bot.sendMessage(chat_id=chat_id, text=answer,
+                                    reply_to_message_id=message_id,
+                                    markdown_support=True)
         
         message = update.message
         chat_id = message.chat_id
@@ -50,6 +52,8 @@ class PrimitiveResponse:
         text_response(['украин'], '🇺🇦')
         
         text_response(['рот ебал', 'ебал в рот'], 'Фуууу, противно!')
+    
+        text_response([r'ага$'], 'в жопе нога', 33)
     
     def _me(self, bot, update, args):
         message = update.message
