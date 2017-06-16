@@ -4,7 +4,7 @@ from model.base_entity import BaseEntity
 
 
 class User(BaseEntity):
-    username = TextField(unique=True)
+    username = TextField()
     user_id = IntegerField(unique=True)
     
     class Meta:
