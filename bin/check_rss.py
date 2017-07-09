@@ -30,6 +30,6 @@ for feed in Feed.select():
 
         bot.send_message(chat_id=CHAT_ID, parse_mode=ParseMode.HTML,
                          text=text,
-                         disable_web_page_preview=True)
+                         disable_web_page_preview=not feed.preview)
         feed.last_update = published
         feed.save()
