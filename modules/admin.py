@@ -12,6 +12,7 @@ class Admin:
     def add_handlers(self, add_handler):
         add_handler(CommandHandler('send', self._send_to_chat, pass_args=True))
         add_handler(CommandHandler('send_to', self._send_to, pass_args=True))
+        add_handler(CommandHandler('leave', self._leave, pass_args=True))
         add_handler(CommandHandler('sql', self._sql, pass_args=True))
     
     def _send_to_chat(self, bot, update, args):
@@ -19,6 +20,15 @@ class Admin:
         if message.from_user.id == self._admin_id:
             text = ' '.join(args)
             bot.sendMessage(chat_id=self._chat_id, text=text)
+        else:
+            bot.sendMessage(chat_id=message.chat_id, text='NIET',
+                            reply_to_message_id=message.message_id)
+
+    def _leave(self, bot, update, args):
+        message = update.message
+        if message.from_user.id == self._admin_id:
+            chat_id = int(args[0])
+            bot.leave_chat(chat_id=chat_id)
         else:
             bot.sendMessage(chat_id=message.chat_id, text='NIET',
                             reply_to_message_id=message.message_id)
