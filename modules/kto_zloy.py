@@ -1,9 +1,8 @@
-from random import randint
+import random
 
-from peewee import fn
-from telegram.ext import CommandHandler
+from telegram.ext import CommandHandler, Filters, MessageHandler
 
-from model import User
+from model import LastUsers, User
 
 
 class KtoZloy:
@@ -13,21 +12,39 @@ class KtoZloy:
     
     def add_handlers(self, add_handler):
         add_handler(CommandHandler('ktozloy', self._kto_zloy))
+        add_handler(MessageHandler(Filters.all, self._update_last_users))
+
+    def _update_last_users(self, bot, update):
+        message = update.message
+        if message.chat_id != self._chat_id:
+            return
     
-    @staticmethod
-    def _kto_zloy(bot, update):
+        user, _ = User.get_or_create(user_id=message.from_user.id, defaults={
+            'username': message.from_user.username})
+    
+        LastUsers.create(user=user)
+
+    def _kto_zloy(self, bot, update):
         message = update.message
         
         chat_id = message.chat_id
-        if randint(1, 10) == 1:
+
+        if chat_id != self._chat_id:
+            return
+
+        if random.randint(1, 10) == 1:
             bot.sendMessage(chat_id=chat_id, text='я злой ¯\_(ツ)_/¯')
             return
+
+        last_users = list(User.select()
+                          .join(LastUsers)
+                          .where(User.username != "")
+                          .group_by(User.username)
+                          .order_by(LastUsers.id.desc())
+                          .limit(10))
+
+        random_user = random.choice(last_users).username
         
-        random_user = User \
-            .select() \
-            .order_by(fn.Random()) \
-            .limit(1) \
-            .get().username
         if random_user == message.from_user.username:
             random_user = 'ты'
         bot.sendMessage(chat_id=chat_id, text='%s злой' % random_user)
