@@ -1,5 +1,6 @@
 import random
 
+from peewee import SQL, fn
 from telegram.ext import CommandHandler, Filters, MessageHandler
 
 from model import LastUsers, User
@@ -18,10 +19,10 @@ class KtoZloy:
         message = update.message
         if message.chat_id != self._chat_id:
             return
-    
+
         user, _ = User.get_or_create(user_id=message.from_user.id, defaults={
             'username': message.from_user.username})
-    
+
         LastUsers.create(user=user)
 
     def _kto_zloy(self, bot, update):
@@ -36,13 +37,14 @@ class KtoZloy:
             bot.sendMessage(chat_id=chat_id, text='я злой ¯\_(ツ)_/¯')
             return
 
-        last_users = list(User.select()
-                          .join(LastUsers)
-                          .where(User.username != "")
-                          .group_by(User.username)
-                          .order_by(LastUsers.id.desc())
-                          .limit(10))
-
+        last_users = list(
+            User.select(User.username, fn.MAX(LastUsers.id).alias("last_id"))
+                .join(LastUsers)
+                .where(User.username != "")
+                .group_by(User.id, User.username)
+                .order_by(SQL("last_id").desc())
+                .limit(10))
+        
         random_user = random.choice(last_users).username
         
         if random_user == message.from_user.username:
