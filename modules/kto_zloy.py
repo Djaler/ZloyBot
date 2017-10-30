@@ -25,6 +25,11 @@ class KtoZloy:
 
         LastUsers.create(user=user)
 
+        border_id = self._get_last_users()[-1].last_id
+        
+        LastUsers.delete().where(
+            LastUsers.id < border_id).execute()
+    
     def _kto_zloy(self, bot, update):
         message = update.message
         
@@ -37,16 +42,20 @@ class KtoZloy:
             bot.sendMessage(chat_id=chat_id, text='я злой ¯\_(ツ)_/¯')
             return
 
-        last_users = list(
+        last_usernames = [row.username for row in self._get_last_users()]
+        
+        random_user = random.choice(last_usernames)
+        
+        if random_user == message.from_user.username:
+            random_user = 'ты'
+        bot.sendMessage(chat_id=chat_id, text='%s злой' % random_user)
+
+    @staticmethod
+    def _get_last_users():
+        return list(
             User.select(User.username, fn.MAX(LastUsers.id).alias("last_id"))
                 .join(LastUsers)
                 .where(User.username != "")
                 .group_by(User.id, User.username)
                 .order_by(SQL("last_id").desc())
                 .limit(10))
-        
-        random_user = random.choice(last_users).username
-        
-        if random_user == message.from_user.username:
-            random_user = 'ты'
-        bot.sendMessage(chat_id=chat_id, text='%s злой' % random_user)
