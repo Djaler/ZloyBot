@@ -1,0 +1,24 @@
+[[source]]
+
+url = "https://pypi.python.org/simple"
+name = "pypi"
+verify_ssl = true
+
+
+[requires]
+
+python_version = "3.6"
+
+
+[packages]
+
+python-telegram-bot = "*"
+peewee = "*"
+psycopg2 = "*"
+feedparser = "*"
+python-dateutil = "*"
+python-dotenv = "*"
+
+
+[dev-packages]
+

@@ -1,6 +1,0 @@
-python-telegram-bot==5.3.1
-peewee
-psycopg2
-feedparser
-python-dateutil
-python-dotenv
