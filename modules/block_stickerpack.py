@@ -3,7 +3,8 @@ from telegram import ParseMode, InlineKeyboardButton, InlineKeyboardMarkup
 from telegram.ext import CommandHandler, Filters, MessageHandler, CallbackQueryHandler
 
 from model import BlockedStickerpack
-from utils import get_admin_ids
+from utils import is_user_group_admin
+from filters import permitted_chat_filter
 
 
 class BlockStickerpack:
@@ -16,11 +17,17 @@ class BlockStickerpack:
         self._admin_id = admin_id
 
     def add_handlers(self, add_handler):
-        add_handler(MessageHandler(Filters.sticker, self._watchdog))
-        add_handler(CommandHandler('block_stickerpack', callback=self._block))
-        add_handler(CommandHandler('unblock_stickerpack', callback=self._unblock))
+        add_handler(MessageHandler(permitted_chat_filter & ~Filters.private & Filters.sticker, self._watchdog))
+        add_handler(CommandHandler('block_stickerpack',
+                                   callback=self._block,
+                                   filters=permitted_chat_filter & ~Filters.private))
+        add_handler(CommandHandler('unblock_stickerpack',
+                                   callback=self._unblock,
+                                   filters=permitted_chat_filter & ~Filters.private))
+        add_handler(CommandHandler('list_stickerpacks',
+                                   callback=self._list,
+                                   filters=permitted_chat_filter & ~Filters.private))
         add_handler(CallbackQueryHandler(self._unblock_stickerpack_button))
-        add_handler(CommandHandler('list_stickerpacks', callback=self._list))
 
     def _get_stickers_link(self, stickerpack_name):
         return self._STICKER_ADD_URL + stickerpack_name
@@ -47,15 +54,8 @@ class BlockStickerpack:
     def _block(self, bot, update):
         message = update.message
 
-        if message.chat_id not in (self._chat_id, self._admin_id):
-            return
-
-        admin_ids = get_admin_ids(bot, message.chat_id)
-        user_id = message.from_user.id
-
-        if user_id not in admin_ids:
+        if not is_user_group_admin(bot, message.from_user.id, message.chat_id):
             message.reply_text(text=self._ADMIN_RESTRICTION_MESSAGE, quote=False)
-            message.delete()
             return
 
         if message.reply_to_message is None or message.reply_to_message.sticker is None:
@@ -80,12 +80,8 @@ class BlockStickerpack:
     def _unblock(self, bot, update):
         message = update.message
 
-        if message.chat_id not in (self._chat_id, self._admin_id):
-            return
-
-        if message.from_user.id not in get_admin_ids(bot, message.chat_id):
+        if not is_user_group_admin(bot, message.from_user.id, message.chat_id):
             message.reply_text(text=self._ADMIN_RESTRICTION_MESSAGE, quote=False)
-            message.delete()
             return
 
         blocked_stickerpacks = self._get_blocked_stickerpacks()
@@ -104,14 +100,11 @@ class BlockStickerpack:
     def _unblock_stickerpack_button(self, bot, update):
         query = update.callback_query
 
-        message = query.message
-
-        if message.chat_id not in (self._chat_id, self._admin_id):
-            return
-
-        if query.from_user.id not in get_admin_ids(bot, message.chat_id):
+        if not is_user_group_admin(bot, query.from_user.id, query.message.chat_id):
             bot.answer_callback_query(query.id, self._ADMIN_RESTRICTION_MESSAGE, show_alert=True)
             return
+
+        message = query.message
 
         stickerpack_name = query.data
 
