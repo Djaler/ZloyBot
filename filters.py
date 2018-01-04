@@ -1,7 +1,5 @@
 from telegram.ext import BaseFilter
 
-from settings import CHAT_ID, ADMIN_ID
-
 
 class ReplyToBotFilter(BaseFilter):
     def filter(self, message):
