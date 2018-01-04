@@ -21,7 +21,7 @@ class KtoZloy:
             return
 
         user, _ = User.get_or_create(user_id=message.from_user.id, defaults={
-            'username': message.from_user.username})
+            'username': message.from_user.name})
 
         LastUsers.create(user=user)
 
@@ -46,7 +46,7 @@ class KtoZloy:
         
         random_user = random.choice(last_usernames)
         
-        if random_user == message.from_user.username:
+        if random_user == message.from_user.name:
             random_user = 'ты'
         bot.sendMessage(chat_id=chat_id, text='%s злой' % random_user)
 

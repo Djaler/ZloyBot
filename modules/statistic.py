@@ -42,7 +42,7 @@ class Statistic:
         user, _ = User.get_or_create(user_id=message.from_user.id,
                                      defaults={
                                          'username':
-                                             message.from_user.username})
+                                             message.from_user.name})
         
         if not user.user_messages_info.exists():
             bot.sendMessage(chat_id=message.chat_id,
@@ -72,10 +72,10 @@ class Statistic:
             return
         
         user, _ = User.get_or_create(user_id=message.from_user.id, defaults={
-            'username': message.from_user.username})
+            'username': message.from_user.name})
         
-        if user.username != message.from_user.username:
-            user.username = message.from_user.username
+        if user.username != message.from_user.name:
+            user.username = message.from_user.name
             user.save()
         
         user_messages_info, _ = UserMessagesInfo \
