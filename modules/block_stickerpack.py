@@ -16,11 +16,11 @@ class BlockStickerpack:
         self._admin_id = admin_id
 
     def add_handlers(self, add_handler):
+        add_handler(MessageHandler(Filters.sticker, self._watchdog))
         add_handler(CommandHandler('block_stickerpack', callback=self._block))
         add_handler(CommandHandler('unblock_stickerpack', callback=self._unblock))
         add_handler(CallbackQueryHandler(self._unblock_stickerpack_button))
         add_handler(CommandHandler('list_stickerpacks', callback=self._list))
-        add_handler(MessageHandler(Filters.sticker, self._watchdog))
 
     def _get_stickers_link(self, stickerpack_name):
         return self._STICKER_ADD_URL + stickerpack_name
@@ -108,7 +108,7 @@ class BlockStickerpack:
         if message.chat_id not in (self._chat_id, self._admin_id):
             return
 
-        if message.from_user.id not in get_admin_ids(bot, message.chat_id):
+        if query.from_user.id not in get_admin_ids(bot, message.chat_id):
             bot.answer_callback_query(query.id, self._ADMIN_RESTRICTION_MESSAGE, show_alert=True)
             return
 
