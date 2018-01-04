@@ -49,7 +49,6 @@ class BlockStickerpack:
             response_text = self._NO_STICKERPACKS_BLOCKED_MESSAGE
 
         message.reply_text(text=response_text, parse_mode=ParseMode.MARKDOWN, quote=False)
-        message.delete()
 
     def _block(self, bot, update):
         message = update.message
@@ -60,7 +59,6 @@ class BlockStickerpack:
 
         if message.reply_to_message is None or message.reply_to_message.sticker is None:
             message.reply_text(text='Команда предназначена только для ответа на сообщения со стикером!', quote=False)
-            message.delete()
             return
 
         sticker = message.reply_to_message.sticker
@@ -74,8 +72,6 @@ class BlockStickerpack:
                             f'Стикер отправил: {message.reply_to_message.from_user.name} | Заблокировал: {message.from_user.name}'
 
         message.reply_text(text=response_text, parse_mode=ParseMode.MARKDOWN, quote=False)
-        message.reply_to_message.delete()
-        message.delete()
 
     def _unblock(self, bot, update):
         message = update.message
@@ -95,7 +91,6 @@ class BlockStickerpack:
             reply_markup = InlineKeyboardMarkup(keyboard, one_time_keyboard=True)
 
         message.reply_text(text=response_text, parse_mode=ParseMode.MARKDOWN, reply_markup=reply_markup, quote=False)
-        message.delete()
 
     def _unblock_stickerpack_button(self, bot, update):
         query = update.callback_query
