@@ -7,6 +7,7 @@ from telegram.ext import (CommandHandler, Dispatcher, Filters, MessageHandler,
 
 from model import init_database
 from modules.admin import Admin
+from modules.block_stickerpack import BlockStickerpack
 from modules.forward import Forward
 from modules.kto_zloy import KtoZloy
 from modules.primitive_response import PrimitiveResponse
@@ -79,6 +80,9 @@ class Bot:
 
         primitive_response = PrimitiveResponse(CHAT_ID)
         primitive_response.add_handlers(self._updater.dispatcher.add_handler)
+
+        block_stickerpack = BlockStickerpack(CHAT_ID, ADMIN_ID)
+        block_stickerpack.add_handlers(self._updater.dispatcher.add_handler)
         
         self._updater.dispatcher.add_error_handler(self._error)
     

@@ -19,9 +19,10 @@ from model.user import User
 from model.user_messages_info import UserMessagesInfo
 from model.feed import Feed
 from model.last_users import LastUsers
+from model.blocked_stickerpack import BlockedStickerpack
 
 
 def init_database():
     database.connect()
     database.create_tables(
-        [User, UserMessagesInfo, Feed, LastUsers], True)
+        [User, UserMessagesInfo, Feed, LastUsers, BlockedStickerpack], True)

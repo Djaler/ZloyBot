@@ -14,10 +14,11 @@ python_version = "3.6"
 
 python-telegram-bot = "*"
 peewee = "*"
-psycopg2 = "*"
+"psycopg2" = "*"
 feedparser = "*"
 python-dateutil = "*"
 python-dotenv = "*"
+supycache = "*"
 
 
 [dev-packages]
