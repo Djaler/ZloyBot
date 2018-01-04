@@ -15,8 +15,9 @@ reply_to_bot_filter = ReplyToBotFilter()
 
 
 class PermittedChatFilter(BaseFilter):
+    def __init__(self, chat_ids):
+        self._chat_ids = chat_ids
+
     def filter(self, message):
-        return message.chat_id in (ADMIN_ID, CHAT_ID)
+        return message.chat_id in self._chat_ids
 
-
-permitted_chat_filter = PermittedChatFilter()
