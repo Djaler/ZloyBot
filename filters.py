@@ -6,7 +6,7 @@ class ReplyToBotFilter(BaseFilter):
         bot_username = message.bot.username
         reply = message.reply_to_message
 
-        return bool(reply) and reply.from_user.name == bot_username
+        return bool(reply) and reply.from_user.username == bot_username
 
 
 reply_to_bot_filter = ReplyToBotFilter()

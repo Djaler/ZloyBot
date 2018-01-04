@@ -4,6 +4,7 @@ from peewee import SQL, fn
 from telegram.ext import CommandHandler, Filters, MessageHandler
 
 from model import LastUsers, User
+from utils import get_username_or_name
 
 
 class KtoZloy:
@@ -21,7 +22,7 @@ class KtoZloy:
             return
 
         user, _ = User.get_or_create(user_id=message.from_user.id, defaults={
-            'username': message.from_user.name})
+            'username': get_username_or_name(message.from_user)})
 
         LastUsers.create(user=user)
 
@@ -45,8 +46,8 @@ class KtoZloy:
         last_usernames = [row.username for row in self._get_last_users()]
         
         random_user = random.choice(last_usernames)
-        
-        if random_user == message.from_user.name:
+
+        if random_user == get_username_or_name(message.from_user):
             random_user = 'ты'
         bot.sendMessage(chat_id=chat_id, text='%s злой' % random_user)
 

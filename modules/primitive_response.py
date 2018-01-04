@@ -4,6 +4,7 @@ from random import choice, randint
 from telegram.ext import CommandHandler, Filters, MessageHandler
 
 from filters import reply_to_bot_filter
+from utils import get_username_or_name
 
 
 class PrimitiveResponse:
@@ -83,7 +84,7 @@ class PrimitiveResponse:
     def _me(self, bot, update, args):
         message = update.message
 
-        text = "{0} {1}".format(message.from_user.name, ' '.join(args))
+        text = "{0} {1}".format(get_username_or_name(message.from_user), ' '.join(args))
         bot.sendMessage(chat_id=self._chat_id, text=text)
 
     @staticmethod

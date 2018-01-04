@@ -1,6 +1,8 @@
+from telegram import Message, User
 from telegram.ext import CommandHandler, Filters, MessageHandler
 
 from model import User, UserMessagesInfo
+from utils import get_username_or_name
 
 
 class Statistic:
@@ -41,8 +43,8 @@ class Statistic:
 
         user, _ = User.get_or_create(user_id=message.from_user.id,
                                      defaults={
-                                         'username':
-                                             message.from_user.name})
+                                         'username': get_username_or_name(
+                                             message.from_user)})
         
         if not user.user_messages_info.exists():
             bot.sendMessage(chat_id=message.chat_id,
@@ -67,15 +69,16 @@ class Statistic:
                                                                     words))
     
     def _update_statistic(self, bot, update):
-        message = update.message
+        message: Message = update.message
         if message.chat_id != self._chat_id:
             return
         
         user, _ = User.get_or_create(user_id=message.from_user.id, defaults={
-            'username': message.from_user.name})
-        
-        if user.username != message.from_user.name:
-            user.username = message.from_user.name
+            'username': get_username_or_name(message.from_user)})
+
+        actual_username = get_username_or_name(message.from_user)
+        if user.username != actual_username:
+            user.username = actual_username
             user.save()
         
         user_messages_info, _ = UserMessagesInfo \
