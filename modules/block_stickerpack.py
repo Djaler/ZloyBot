@@ -19,7 +19,7 @@ class BlockStickerpack:
         self.permitted_chat_filter = PermittedChatFilter([self._admin_id, self._chat_id])
 
     def add_handlers(self, add_handler):
-        add_handler(MessageHandler(PermittedChatFilter([self._admin_id, self._chat_id]) & ~Filters.private & Filters.sticker, self._watchdog))
+        add_handler(MessageHandler(self.permitted_chat_filter & ~Filters.private & Filters.sticker, self._watchdog))
         add_handler(CommandHandler('block_stickerpack',
                                    callback=self._block,
                                    filters=self.permitted_chat_filter))
@@ -55,7 +55,8 @@ class BlockStickerpack:
     def _block(self, bot, update):
         message = update.message
 
-        if message.from_user.id != self._admin_id and not is_user_group_admin(bot, message.from_user.id, message.chat_id):
+        if message.from_user.id != self._admin_id and not is_user_group_admin(bot, message.from_user.id,
+                                                                              message.chat_id, self._admin_id):
             message.reply_text(text=self._ADMIN_RESTRICTION_MESSAGE, quote=False)
             return
 
@@ -78,7 +79,8 @@ class BlockStickerpack:
     def _unblock(self, bot, update):
         message = update.message
 
-        if message.from_user.id != self._admin_id and not is_user_group_admin(bot, message.from_user.id, message.chat_id):
+        if message.from_user.id != self._admin_id and not is_user_group_admin(bot, message.from_user.id,
+                                                                              message.chat_id, self._admin_id):
             message.reply_text(text=self._ADMIN_RESTRICTION_MESSAGE, quote=False)
             return
 
@@ -97,7 +99,8 @@ class BlockStickerpack:
     def _unblock_stickerpack_button(self, bot, update):
         query = update.callback_query
 
-        if query.from_user.id != self._admin_id and not is_user_group_admin(bot, query.from_user.id, query.message.chat_id):
+        if query.from_user.id != self._admin_id and not is_user_group_admin(bot, query.from_user.id,
+                                                                            query.message.chat_id, self._admin_id):
             bot.answer_callback_query(query.id, self._ADMIN_RESTRICTION_MESSAGE, show_alert=True)
             return
 

@@ -20,4 +20,3 @@ class PermittedChatFilter(BaseFilter):
 
     def filter(self, message):
         return message.chat_id in self._chat_ids
-
