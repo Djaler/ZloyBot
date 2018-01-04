@@ -3,6 +3,7 @@ from telegram import ParseMode, InlineKeyboardButton, InlineKeyboardMarkup
 from telegram.ext import CommandHandler, Filters, MessageHandler, CallbackQueryHandler
 
 from model import BlockedStickerpack
+from settings import ADMIN_ID
 from utils import is_user_group_admin
 from filters import permitted_chat_filter
 
@@ -20,13 +21,13 @@ class BlockStickerpack:
         add_handler(MessageHandler(permitted_chat_filter & ~Filters.private & Filters.sticker, self._watchdog))
         add_handler(CommandHandler('block_stickerpack',
                                    callback=self._block,
-                                   filters=permitted_chat_filter & ~Filters.private))
+                                   filters=permitted_chat_filter))
         add_handler(CommandHandler('unblock_stickerpack',
                                    callback=self._unblock,
-                                   filters=permitted_chat_filter & ~Filters.private))
+                                   filters=permitted_chat_filter))
         add_handler(CommandHandler('list_stickerpacks',
                                    callback=self._list,
-                                   filters=permitted_chat_filter & ~Filters.private))
+                                   filters=permitted_chat_filter))
         add_handler(CallbackQueryHandler(self._unblock_stickerpack_button))
 
     def _get_stickers_link(self, stickerpack_name):
@@ -53,7 +54,7 @@ class BlockStickerpack:
     def _block(self, bot, update):
         message = update.message
 
-        if not is_user_group_admin(bot, message.from_user.id, message.chat_id):
+        if message.from_user.id != ADMIN_ID and not is_user_group_admin(bot, message.from_user.id, message.chat_id):
             message.reply_text(text=self._ADMIN_RESTRICTION_MESSAGE, quote=False)
             return
 
@@ -76,7 +77,7 @@ class BlockStickerpack:
     def _unblock(self, bot, update):
         message = update.message
 
-        if not is_user_group_admin(bot, message.from_user.id, message.chat_id):
+        if message.from_user.id != ADMIN_ID and not is_user_group_admin(bot, message.from_user.id, message.chat_id):
             message.reply_text(text=self._ADMIN_RESTRICTION_MESSAGE, quote=False)
             return
 
@@ -95,7 +96,7 @@ class BlockStickerpack:
     def _unblock_stickerpack_button(self, bot, update):
         query = update.callback_query
 
-        if not is_user_group_admin(bot, query.from_user.id, query.message.chat_id):
+        if query.from_user.id != ADMIN_ID and not is_user_group_admin(bot, query.from_user.id, query.message.chat_id):
             bot.answer_callback_query(query.id, self._ADMIN_RESTRICTION_MESSAGE, show_alert=True)
             return
 
