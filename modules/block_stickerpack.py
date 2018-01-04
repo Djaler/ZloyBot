@@ -1,5 +1,5 @@
 from peewee import DoesNotExist
-from telegram import ParseMode, InlineKeyboardButton, ReplyKeyboardMarkup, InlineKeyboardMarkup, ChatMember
+from telegram import ParseMode, InlineKeyboardButton, InlineKeyboardMarkup
 from telegram.ext import CommandHandler, Filters, MessageHandler, CallbackQueryHandler
 
 from model import BlockedStickerpack
@@ -25,7 +25,8 @@ class BlockStickerpack:
     def _get_stickers_link(self, stickerpack_name):
         return self._STICKER_ADD_URL + stickerpack_name
 
-    def _get_blocked_stickerpacks(self):
+    @staticmethod
+    def _get_blocked_stickerpacks():
         return BlockedStickerpack.select()
 
     def _list(self, bot, update):
@@ -124,12 +125,13 @@ class BlockStickerpack:
 
         message.edit_text(text=response_text, parse_mode=ParseMode.MARKDOWN)
 
-    def _watchdog(self, bot, update):
+    @staticmethod
+    def _watchdog(bot, update):
         message = update.message
         sticker = message.sticker
 
         try:
-            queryset = BlockedStickerpack.get(BlockedStickerpack.name == sticker.set_name)
+            BlockedStickerpack.get(BlockedStickerpack.name == sticker.set_name)
         except DoesNotExist:
             return
 
