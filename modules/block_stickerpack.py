@@ -3,7 +3,8 @@ from telegram import ParseMode, InlineKeyboardButton, InlineKeyboardMarkup
 from telegram.ext import CommandHandler, Filters, MessageHandler, CallbackQueryHandler
 
 from model import BlockedStickerpack
-from utils import get_admin_ids
+from utils import is_user_group_admin
+from filters import PermittedChatFilter
 
 
 class BlockStickerpack:
@@ -15,12 +16,20 @@ class BlockStickerpack:
         self._chat_id = chat_id
         self._admin_id = admin_id
 
+        self.permitted_chat_filter = PermittedChatFilter([self._admin_id, self._chat_id])
+
     def add_handlers(self, add_handler):
-        add_handler(MessageHandler(Filters.sticker, self._watchdog))
-        add_handler(CommandHandler('block_stickerpack', callback=self._block))
-        add_handler(CommandHandler('unblock_stickerpack', callback=self._unblock))
+        add_handler(MessageHandler(self.permitted_chat_filter & ~Filters.private & Filters.sticker, self._watchdog))
+        add_handler(CommandHandler('block_stickerpack',
+                                   callback=self._block,
+                                   filters=self.permitted_chat_filter))
+        add_handler(CommandHandler('unblock_stickerpack',
+                                   callback=self._unblock,
+                                   filters=self.permitted_chat_filter))
+        add_handler(CommandHandler('list_stickerpacks',
+                                   callback=self._list,
+                                   filters=self.permitted_chat_filter))
         add_handler(CallbackQueryHandler(self._unblock_stickerpack_button))
-        add_handler(CommandHandler('list_stickerpacks', callback=self._list))
 
     def _get_stickers_link(self, stickerpack_name):
         return self._STICKER_ADD_URL + stickerpack_name
@@ -42,25 +51,17 @@ class BlockStickerpack:
             response_text = self._NO_STICKERPACKS_BLOCKED_MESSAGE
 
         message.reply_text(text=response_text, parse_mode=ParseMode.MARKDOWN, quote=False)
-        message.delete()
 
     def _block(self, bot, update):
         message = update.message
 
-        if message.chat_id not in (self._chat_id, self._admin_id):
-            return
-
-        admin_ids = get_admin_ids(bot, message.chat_id)
-        user_id = message.from_user.id
-
-        if user_id not in admin_ids:
+        if message.from_user.id != self._admin_id and not is_user_group_admin(bot, message.from_user.id,
+                                                                              message.chat_id, self._admin_id):
             message.reply_text(text=self._ADMIN_RESTRICTION_MESSAGE, quote=False)
-            message.delete()
             return
 
         if message.reply_to_message is None or message.reply_to_message.sticker is None:
             message.reply_text(text='Команда предназначена только для ответа на сообщения со стикером!', quote=False)
-            message.delete()
             return
 
         sticker = message.reply_to_message.sticker
@@ -74,18 +75,13 @@ class BlockStickerpack:
                             f'Стикер отправил: {message.reply_to_message.from_user.name} | Заблокировал: {message.from_user.name}'
 
         message.reply_text(text=response_text, parse_mode=ParseMode.MARKDOWN, quote=False)
-        message.reply_to_message.delete()
-        message.delete()
 
     def _unblock(self, bot, update):
         message = update.message
 
-        if message.chat_id not in (self._chat_id, self._admin_id):
-            return
-
-        if message.from_user.id not in get_admin_ids(bot, message.chat_id):
+        if message.from_user.id != self._admin_id and not is_user_group_admin(bot, message.from_user.id,
+                                                                              message.chat_id, self._admin_id):
             message.reply_text(text=self._ADMIN_RESTRICTION_MESSAGE, quote=False)
-            message.delete()
             return
 
         blocked_stickerpacks = self._get_blocked_stickerpacks()
@@ -99,19 +95,16 @@ class BlockStickerpack:
             reply_markup = InlineKeyboardMarkup(keyboard, one_time_keyboard=True)
 
         message.reply_text(text=response_text, parse_mode=ParseMode.MARKDOWN, reply_markup=reply_markup, quote=False)
-        message.delete()
 
     def _unblock_stickerpack_button(self, bot, update):
         query = update.callback_query
 
-        message = query.message
-
-        if message.chat_id not in (self._chat_id, self._admin_id):
-            return
-
-        if query.from_user.id not in get_admin_ids(bot, message.chat_id):
+        if query.from_user.id != self._admin_id and not is_user_group_admin(bot, query.from_user.id,
+                                                                            query.message.chat_id, self._admin_id):
             bot.answer_callback_query(query.id, self._ADMIN_RESTRICTION_MESSAGE, show_alert=True)
             return
+
+        message = query.message
 
         stickerpack_name = query.data
 
