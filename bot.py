@@ -12,6 +12,7 @@ from modules.forward import Forward
 from modules.kto_zloy import KtoZloy
 from modules.primitive_response import PrimitiveResponse
 from modules.random_reaction import random_reaction
+from modules.reply_to_pin import ReplyToPin
 from modules.resolve import resolve
 from modules.statistic import Statistic
 from settings import ADMIN_ID, CHAT_ID, ENV, PORT, TOKEN, URL
@@ -83,6 +84,9 @@ class Bot:
 
         block_stickerpack = BlockStickerpack(CHAT_ID, ADMIN_ID)
         block_stickerpack.add_handlers(self._updater.dispatcher.add_handler)
+
+        reply_to_pin = ReplyToPin(CHAT_ID, ADMIN_ID)
+        reply_to_pin.add_handlers(self._updater.dispatcher.add_handler)
         
         self._updater.dispatcher.add_error_handler(self._error)
     

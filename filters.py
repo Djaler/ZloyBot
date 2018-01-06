@@ -1,3 +1,4 @@
+from telegram import Chat
 from telegram.ext import BaseFilter
 
 
@@ -10,6 +11,14 @@ class ReplyToBotFilter(BaseFilter):
 
 
 reply_to_bot_filter = ReplyToBotFilter()
+
+
+class SuperGroupFilter(BaseFilter):
+    def filter(self, message):
+        return message.chat.type == Chat.SUPERGROUP
+
+
+supergroup_filter = SuperGroupFilter()
 
 
 class PermittedChatFilter(BaseFilter):
