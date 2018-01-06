@@ -4,8 +4,6 @@ from filters import PermittedChatFilter, supergroup_filter
 
 
 class ReplyToPin:
-    MESSAGES_TO_RESPOND = 50
-
     def __init__(self, chat_id, admin_id):
         self._chat_id = chat_id
         self._admin_id = admin_id
@@ -20,12 +18,6 @@ class ReplyToPin:
 
     def reply_to_pin(self, bot, update):
         message = update.message
-
-        if self.last_message_id is None:
-            self.last_message_id = message.message_id - self.MESSAGES_TO_RESPOND
-
-        if message.message_id - self.last_message_id < self.MESSAGES_TO_RESPOND:
-            return
 
         chat = bot.get_chat(message.chat_id)
         if chat.pinned_message is None:
