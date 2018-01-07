@@ -9,7 +9,7 @@ from utils import is_user_group_admin, get_username_or_name
 
 class BlockStickerpack:
     _STICKER_ADD_URL = 'https://t.me/addstickers/'
-    _ADMIN_RESTRICTION_MESSAGE = 'Это функция предназначена только для админов!'
+    _ADMIN_RESTRICTION_MESSAGE = 'Эта функция предназначена только для админов!'
     _NO_STICKERPACKS_BLOCKED_MESSAGE = 'Заблокированных стикерпаков нет.'
 
     def __init__(self, chat_id, admin_id):
