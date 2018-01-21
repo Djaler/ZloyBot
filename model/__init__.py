@@ -1,6 +1,6 @@
 import urllib.parse
 
-from settings import DATABASE_URL, ENV
+from settings import DATABASE_URL, ENV, MAX_CONNECTIONS, STALE_TIMEOUT
 
 if ENV == "prod":
     from playhouse.pool import PooledPostgresqlDatabase
@@ -9,8 +9,8 @@ if ENV == "prod":
     url = urllib.parse.urlparse(DATABASE_URL)
     database = PooledPostgresqlDatabase(url.path[1:], user=url.username,
                                         password=url.password, host=url.hostname,
-                                        port=url.port, max_connections=10,
-                                        stale_timeout=30)
+                                        port=url.port, max_connections=MAX_CONNECTIONS,
+                                        stale_timeout=STALE_TIMEOUT)
 else:
     from peewee import SqliteDatabase
 

@@ -13,3 +13,5 @@ ENV = os.environ.get("ENV", "prod")
 PORT = int(os.environ.get('PORT', '5000'))
 URL = os.environ.get("URL")
 DATABASE_URL = os.environ["DATABASE_URL"]
+MAX_CONNECTIONS = os.environ.get("MAX_CONNECTIONS", 10)
+STALE_TIMEOUT = os.environ.get("STALE_TIMEOUT", 30)
