@@ -1,4 +1,5 @@
 import random
+import logging
 
 from peewee import SQL, fn
 from telegram.ext import CommandHandler, Filters, MessageHandler
@@ -27,6 +28,8 @@ class KtoZloy:
         LastUsers.create(user=user)
 
         border_id = self._get_last_users()[-1].last_id
+        
+        logging.warning("border_id = " + str(border_id))
         
         LastUsers.delete().where(
             LastUsers.id < border_id).execute()
