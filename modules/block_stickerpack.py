@@ -92,7 +92,7 @@ class BlockStickerpack:
             reply_markup = None
         else:
             response_text = 'Выберите стикерпак, который нужно разблокировать:'
-            keyboard = [[InlineKeyboardButton(f'{index}. {sp.name}', callback_data=sp.name)]
+            keyboard = [[InlineKeyboardButton(f'{index}. {sp.name}', callback_data=f'{__name__}/{sp.name}')]
                         for index, sp in enumerate(blocked_stickerpacks, start=1)]
             reply_markup = InlineKeyboardMarkup(keyboard, one_time_keyboard=True)
 
@@ -101,6 +101,11 @@ class BlockStickerpack:
     def _unblock_stickerpack_button(self, bot, update):
         query = update.callback_query
 
+        module, pack_name = query.data.split('/')
+
+        if module != __name__:
+            return
+
         if query.from_user.id != self._admin_id and not is_user_group_admin(bot, query.from_user.id,
                                                                             query.message.chat_id, self._admin_id):
             bot.answer_callback_query(query.id, self._ADMIN_RESTRICTION_MESSAGE, show_alert=True)
@@ -108,7 +113,6 @@ class BlockStickerpack:
 
         message = query.message
 
-        pack_name = query.data
         pack_link = self._get_stickers_link(pack_name)
 
         try:
