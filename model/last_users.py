@@ -5,7 +5,7 @@ from model.user import User
 
 
 class LastUsers(BaseEntity):
-    user = ForeignKeyField(User)
-    
+    user = ForeignKeyField(User, unique=True)
+
     class Meta:
         db_table = 'last_users'
