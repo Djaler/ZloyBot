@@ -15,7 +15,9 @@ from modules.random_reaction import random_reaction
 from modules.reply_to_pin import ReplyToPin
 from modules.resolve import resolve
 from modules.statistic import Statistic
+from modules.user_join_captcha import UserJoinCaptcha
 from settings import ADMIN_ID, CHAT_ID, ENV, PORT, TOKEN, URL
+from settings import USER_JOIN_CAPTCHA_ENABLED
 
 
 def process_update(obj, update):
@@ -87,6 +89,10 @@ class Bot:
 
         reply_to_pin = ReplyToPin(CHAT_ID, ADMIN_ID)
         reply_to_pin.add_handlers(self._updater.dispatcher.add_handler)
+
+        if USER_JOIN_CAPTCHA_ENABLED:
+            user_join_captcha = UserJoinCaptcha(CHAT_ID, ADMIN_ID)
+            user_join_captcha.add_handlers(self._updater.dispatcher.add_handler)
         
         self._updater.dispatcher.add_error_handler(self._error)
     

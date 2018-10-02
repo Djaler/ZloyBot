@@ -5,6 +5,7 @@ from telegram.ext import CommandHandler, Filters, MessageHandler, CallbackQueryH
 from filters import PermittedChatFilter
 from model import BlockedStickerpack
 from utils import is_user_group_admin, get_username_or_name
+from utils import set_callback_data, process_callback_query, get_callback_data
 
 
 class BlockStickerpack:
@@ -92,14 +93,17 @@ class BlockStickerpack:
             reply_markup = None
         else:
             response_text = 'Выберите стикерпак, который нужно разблокировать:'
-            keyboard = [[InlineKeyboardButton(f'{index}. {sp.name}', callback_data=sp.name)]
+            keyboard = [[InlineKeyboardButton(f'{index}. {sp.name}', callback_data=set_callback_data(sp.name))]
                         for index, sp in enumerate(blocked_stickerpacks, start=1)]
             reply_markup = InlineKeyboardMarkup(keyboard, one_time_keyboard=True)
 
         message.reply_text(text=response_text, parse_mode=ParseMode.MARKDOWN, reply_markup=reply_markup, quote=False)
 
+    @process_callback_query
     def _unblock_stickerpack_button(self, bot, update):
         query = update.callback_query
+
+        pack_name = get_callback_data(query.data)
 
         if query.from_user.id != self._admin_id and not is_user_group_admin(bot, query.from_user.id,
                                                                             query.message.chat_id, self._admin_id):
@@ -108,7 +112,6 @@ class BlockStickerpack:
 
         message = query.message
 
-        pack_name = query.data
         pack_link = self._get_stickers_link(pack_name)
 
         try:

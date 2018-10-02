@@ -15,3 +15,5 @@ URL = os.environ.get("URL")
 DATABASE_URL = os.environ["DATABASE_URL"]
 MAX_CONNECTIONS = os.environ.get("MAX_CONNECTIONS", 10)
 STALE_TIMEOUT = os.environ.get("STALE_TIMEOUT", 30)
+
+USER_JOIN_CAPTCHA_ENABLED = bool(os.environ.get("USER_JOIN_CAPTCHA_ENABLED", False))

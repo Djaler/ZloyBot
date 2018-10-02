@@ -26,4 +26,4 @@ from model.blocked_stickerpack import BlockedStickerpack
 def init_database():
     database.connect()
     database.create_tables(
-        [User, UserMessagesInfo, Feed, LastUsers, BlockedStickerpack], True)
+        [User, UserMessagesInfo, Feed, LastUsers, BlockedStickerpack])
