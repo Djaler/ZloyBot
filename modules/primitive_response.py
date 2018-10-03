@@ -1,5 +1,6 @@
 import re
 from random import choice, randint
+from typing import Text, List, Union
 
 from telegram.ext import CommandHandler, Filters, MessageHandler
 
@@ -19,8 +20,11 @@ class PrimitiveResponse:
         add_handler(CommandHandler('me', self._me, pass_args=True))
 
     def text_responses(self, bot, update):
-        def text_response(patterns, answer, chance=100):
+        def text_response(patterns, answer: Union[Text, List], chance=100):
             if any(re.search(pattern, text) for pattern in patterns):
+                if answer is list:
+                    answer = choice(answer)
+
                 if answer.endswith('.txt'):
                     answer = self._choice_variant_from_file(answer)
 
@@ -61,6 +65,8 @@ class PrimitiveResponse:
 
         text_response([r'\bнет$'], 'пидора ответ', 10)
 
+        text_response(['/ban', r'\bban$'], ['себя забань', 'давно пора'], 50)
+
     def reply_responses(self, bot, update):
         def reply_response(patterns, answer, chance=100):
             if any(re.search(pattern, text) for pattern in patterns):
@@ -77,7 +83,7 @@ class PrimitiveResponse:
         text = message.text.lower()
         message_id = message.message_id
 
-        reply_response(['.*'], "Чё сказал?", 33)
+        reply_response(['.*'], ["Чё сказал?", "А ну повтори", 'Слыш, пошли выйдем'])
 
     def _me(self, bot, update, args):
         message = update.message
