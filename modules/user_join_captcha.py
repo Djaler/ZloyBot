@@ -1,3 +1,5 @@
+import random
+
 from telegram import InlineKeyboardButton, InlineKeyboardMarkup
 from telegram.ext import MessageHandler, CallbackQueryHandler
 from telegram.ext.filters import Filters
@@ -10,10 +12,11 @@ from utils import set_callback_data, process_callback_query, get_callback_data
 class UserJoinCaptcha:
     _ON_JOIN_MESSAGE = 'Эй, {username}!\n' \
                        'Мы отобрали твою свободу слова, пока ты не тыкнешь сюда 👇'
-    _ON_APPROVE_MESSAGE = 'Ты смог нажать на кнопку! Уровень твоего развития уже выше, чем у большинства чертей ' \
-                          'из этого чата. 🤔'
-    _ON_ACCESS_RESTRICTED_MESSAGE = 'КУДА ЖМЁШЬ?!️! РУКУ УБРАЛ!'
-    _INLINE_BUTTON_TEXT = 'Аниме - моя жизнь 🤡'
+    _ON_APPROVE_MESSAGES = [
+        'Ты смог нажать на кнопку! Уровень твоего развития уже выше, чем у большинства чертей из этого чата.',
+        'Ты справился. Ты или кусок мяса, или ИИ, прямо как я']
+    _ON_ACCESS_RESTRICTED_MESSAGES = ['КУДА ЖМЁШЬ?!️! РУКУ УБРАЛ!', 'У тебя здесь нет власти!']
+    _INLINE_BUTTON_TEXTS = ['Аниме - моя жизнь', 'Я отдаю свою жизнь и честь Ночному Дозору']
 
     def __init__(self, chat_id, admin_id):
         self._chat_id = chat_id
@@ -40,7 +43,8 @@ class UserJoinCaptcha:
                                      member.id,
                                      can_send_messages=False)
 
-            keyboard = [[InlineKeyboardButton(self._INLINE_BUTTON_TEXT, callback_data=set_callback_data(member.id))]]
+            keyboard = [[InlineKeyboardButton(random.choice(self._INLINE_BUTTON_TEXTS),
+                                              callback_data=set_callback_data(member.id))]]
             reply_markup = InlineKeyboardMarkup(keyboard, one_time_keyboard=True)
 
             bot.send_message(
@@ -59,7 +63,7 @@ class UserJoinCaptcha:
         username = get_username_or_name(user)
 
         if user.id != suspect_id:
-            bot.answer_callback_query(query.id, self._ON_ACCESS_RESTRICTED_MESSAGE.format(username=username),
+            bot.answer_callback_query(query.id, random.choice(self._ON_ACCESS_RESTRICTED_MESSAGES),
                                       show_alert=True)
             return
 
@@ -70,4 +74,4 @@ class UserJoinCaptcha:
                                  can_send_other_messages=True,
                                  can_add_web_page_previews=True)
 
-        query.message.edit_text(text=self._ON_APPROVE_MESSAGE.format(username=username))
+        query.message.edit_text(text=random.choice(self._ON_APPROVE_MESSAGES))
