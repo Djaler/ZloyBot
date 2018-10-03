@@ -67,6 +67,7 @@ class UserJoinCaptcha:
                                  suspect_id,
                                  can_send_messages=True,
                                  can_send_media_messages=True,
-                                 can_send_other_messages=True)
+                                 can_send_other_messages=True,
+                                 can_add_web_page_previews=True)
 
         query.message.edit_text(text=self._ON_APPROVE_MESSAGE.format(username=username))
