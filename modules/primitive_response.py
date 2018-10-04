@@ -22,7 +22,7 @@ class PrimitiveResponse:
     def text_responses(self, bot, update):
         def text_response(patterns, answer: Union[Text, List], chance=100):
             if any(re.search(pattern, text) for pattern in patterns):
-                if answer is list:
+                if isinstance(answer, list):
                     answer = choice(answer)
 
                 if answer.endswith('.txt'):
