@@ -13,7 +13,7 @@ class PrimitiveResponse:
         self._chat_id = chat_id
 
     def add_handlers(self, add_handler):
-        add_handler(MessageHandler(Filters.text, self.text_responses))
+        add_handler(MessageHandler(Filters.text | Filters.command, self.text_responses))
         add_handler(
             MessageHandler(Filters.text & reply_to_bot_filter,
                            self.reply_responses))
@@ -60,6 +60,8 @@ class PrimitiveResponse:
         text_response(['утра', 'доброе утро', 'утречка'], 'utro.txt')
 
         text_response(['рот ебал', 'ебал в рот'], 'Фуууу, противно!')
+
+        text_response(['не получается', 'не получилось'], 'ну ты и лох')
 
         text_response([r'\bага$'], 'в жопе нога', 33)
 
