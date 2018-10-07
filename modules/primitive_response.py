@@ -88,7 +88,7 @@ class PrimitiveResponse:
         text = message.text.lower()
         message_id = message.message_id
 
-        reply_response(['.*'], ["Чё сказал?", "А ну повтори", 'Слыш, пошли выйдем'])
+        reply_response(['.*'], ["Чё сказал?", "А ну повтори", 'Слыш, пошли выйдем'], 50)
 
     def _me(self, bot, update, args):
         message = update.message
