@@ -74,4 +74,4 @@ class UserJoinCaptcha:
                                  can_send_other_messages=True,
                                  can_add_web_page_previews=True)
 
-        query.message.edit_text(text=random.choice(self._ON_APPROVE_MESSAGES))
+        query.message.delete()
