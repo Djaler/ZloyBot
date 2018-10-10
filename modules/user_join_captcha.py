@@ -64,7 +64,7 @@ class UserJoinCaptcha:
 
         if user.id != suspect_id:
             bot.answer_callback_query(query.id, random.choice(self._ON_ACCESS_RESTRICTED_MESSAGES),
-                                      show_alert=True)
+                                      show_alert=False)
             return
 
         bot.restrict_chat_member(self._chat_id,
