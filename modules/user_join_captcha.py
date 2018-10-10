@@ -40,6 +40,8 @@ class UserJoinCaptcha:
                                      member.id,
                                      can_send_messages=False)
 
+            message.delete()
+
             keyboard = [[InlineKeyboardButton(random.choice(self._INLINE_BUTTON_TEXTS),
                                               callback_data=set_callback_data(member.id))]]
             reply_markup = InlineKeyboardMarkup(keyboard, one_time_keyboard=True)
