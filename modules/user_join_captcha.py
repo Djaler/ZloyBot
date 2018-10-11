@@ -12,9 +12,6 @@ from utils import set_callback_data, process_callback_query, get_callback_data
 class UserJoinCaptcha:
     _ON_JOIN_MESSAGE = 'Эй, {username}!\n' \
                        'Мы отобрали твою свободу слова, пока ты не тыкнешь сюда 👇'
-    _ON_APPROVE_MESSAGES = [
-        'Ты смог нажать на кнопку! Уровень твоего развития уже выше, чем у большинства чертей из этого чата.',
-        'Ты справился. Ты или кусок мяса, или ИИ, прямо как я']
     _ON_ACCESS_RESTRICTED_MESSAGES = ['КУДА ЖМЁШЬ?!️! РУКУ УБРАЛ!', 'У тебя здесь нет власти!']
     _INLINE_BUTTON_TEXTS = ['Аниме - моя жизнь', 'Я отдаю свою жизнь и честь Ночному Дозору']
 
@@ -34,6 +31,8 @@ class UserJoinCaptcha:
     def _send_captcha(self, bot, update):
         message = update.message
         new_members = message.new_chat_members
+
+        message.delete()
 
         for member in new_members:
             if member.is_bot:
@@ -60,11 +59,9 @@ class UserJoinCaptcha:
 
         suspect_id = int(get_callback_data(query.data))
 
-        username = get_username_or_name(user)
-
         if user.id != suspect_id:
             bot.answer_callback_query(query.id, random.choice(self._ON_ACCESS_RESTRICTED_MESSAGES),
-                                      show_alert=True)
+                                      show_alert=False)
             return
 
         bot.restrict_chat_member(self._chat_id,
@@ -74,4 +71,4 @@ class UserJoinCaptcha:
                                  can_send_other_messages=True,
                                  can_add_web_page_previews=True)
 
-        query.message.edit_text(text=random.choice(self._ON_APPROVE_MESSAGES))
+        query.message.delete()
