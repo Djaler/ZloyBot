@@ -32,6 +32,8 @@ class UserJoinCaptcha:
         message = update.message
         new_members = message.new_chat_members
 
+        message.delete()
+
         for member in new_members:
             if member.is_bot:
                 continue
@@ -39,8 +41,6 @@ class UserJoinCaptcha:
             bot.restrict_chat_member(self._chat_id,
                                      member.id,
                                      can_send_messages=False)
-
-            message.delete()
 
             keyboard = [[InlineKeyboardButton(random.choice(self._INLINE_BUTTON_TEXTS),
                                               callback_data=set_callback_data(member.id))]]
