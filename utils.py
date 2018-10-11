@@ -1,6 +1,7 @@
 import functools
 import typing
 import inspect
+import itertools
 
 import supycache
 from telegram import Bot, User
@@ -58,3 +59,32 @@ def process_callback_query(func):
         return lambda: True  # помечает update с CallbackQuery обработанным, если ни один из хендлеров не подошел
 
     return inner
+
+
+def grouper(iterable, n):
+    """
+    Позволяет разбивать итерабельный обьект по группам размера n
+
+    В отличии от рецепта grouper(iterable, n, fillvalue=None) документации
+    itertools (https://docs.python.org/3/library/itertools.html#itertools-recipes)
+    не заполняет недостяющее количество элементов в группе при помощи fillvalue
+
+    Возвращает генератор
+
+    Пример:
+
+    >>> my_list = [1, 2, 3, 4, 5, 6, 7, 8, 9]
+    >>> tuple(grouper(my_list, 3))
+    ((1, 2, 3), (4, 5, 6), (7, 8, 9))
+    >>> tuple(grouper(my_list, 6))
+    ((1, 2, 3, 4, 5, 6), (7, 8, 9))
+
+    """
+    it = iter(iterable)
+
+    while True:
+        res = tuple(itertools.islice(it, n))
+        if res:
+            yield res
+        else:
+            break
