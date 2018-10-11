@@ -71,8 +71,9 @@ class BlockStickerpack:
         if not created:
             response_text = f'Стикерпак [{pack_name}]({pack_link}) уже заблокирован.'
         else:
-            sticker_from = get_username_or_name(message.reply_to_message.from_user)
-            who_block = get_username_or_name(message.from_user)
+            # mention_markdown позволяет кликнуть по пользователю и глянуть кто это, вместо простого имени / юзернейма
+            sticker_from = message.reply_to_message.from_user.mention_markdown()
+            who_block = message.from_user.mention_markdown()
 
             response_text = f'Стикерпак [{pack_name}]({pack_link}) успешно заблокирован!\n' \
                             f'Стикер отправил: {sticker_from} | Заблокировал: {who_block}'
