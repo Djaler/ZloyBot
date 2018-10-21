@@ -5,7 +5,6 @@ from telegram.ext import MessageHandler, CallbackQueryHandler
 from telegram.ext.filters import Filters
 
 from filters import PermittedChatFilter, supergroup_filter
-from utils import get_username_or_name
 from utils import set_callback_data, process_callback_query, get_callback_data
 
 
@@ -31,8 +30,6 @@ class UserJoinCaptcha:
     def _send_captcha(self, bot, update):
         message = update.message
         new_members = message.new_chat_members
-
-        message.delete()
 
         for member in new_members:
             if member.is_bot:
