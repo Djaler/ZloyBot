@@ -10,6 +10,7 @@ from modules.admin import Admin
 from modules.block_stickerpack import BlockStickerpack
 from modules.forward import Forward
 from modules.kto_zloy import KtoZloy
+from modules.pay_respect import pay_respect
 from modules.primitive_response import PrimitiveResponse
 from modules.random_reaction import random_reaction
 from modules.reply_to_pin import ReplyToPin
@@ -77,6 +78,9 @@ class Bot:
             CommandHandler('resolve', resolve, pass_args=True))
         self._updater.dispatcher.add_handler(
             CommandHandler('r', resolve, pass_args=True))
+
+        self._updater.dispatcher.add_handler(
+            CommandHandler('f', pay_respect))
 
         admin = Admin(CHAT_ID, ADMIN_ID)
         admin.add_handlers(self._updater.dispatcher.add_handler)
