@@ -1,5 +1,5 @@
 import re
-from random import choice, randint
+from random import choice, randint, shuffle
 from typing import Text, List, Union
 
 from telegram.ext import CommandHandler, Filters, MessageHandler
@@ -20,19 +20,22 @@ class PrimitiveResponse:
         add_handler(CommandHandler('me', self._me, pass_args=True))
 
     def text_responses(self, bot, update):
+        class Response:
+            def __init__(self, patterns, answer, chance):
+                self.patterns = patterns
+                self.answer = answer
+                self.chance = chance
+
         def text_response(patterns, answer: Union[Text, List], chance=100):
-            if any(re.search(pattern, text) for pattern in patterns):
-                if isinstance(answer, list):
-                    answer = choice(answer)
+            if isinstance(answer, list):
+                answer = choice(answer)
 
-                if answer.endswith('.txt'):
-                    answer = self._choice_variant_from_file(answer)
+            if answer.endswith('.txt'):
+                answer = self._choice_variant_from_file(answer)
 
-                if randint(1, 100) <= chance:
-                    bot.sendMessage(chat_id=chat_id, text=answer,
-                                    reply_to_message_id=message_id,
-                                    markdown_support=True)
+            responses.append(Response(patterns, answer, chance))
 
+        responses = []
         message = update.message
         chat_id = message.chat_id
         text = message.text.lower()
@@ -68,6 +71,16 @@ class PrimitiveResponse:
         text_response([r'\bнет$'], 'пидора ответ', 10)
 
         text_response(['/ban', r'\bban$'], ['себя забань', 'давно пора'], 50)
+
+        shuffle(responses)
+
+        for resp in responses:
+            if any(re.search(pattern, text) for pattern in resp.patterns):
+                if randint(1, 100) <= resp.chance:
+                    bot.sendMessage(chat_id=chat_id, text=resp.answer,
+                                    reply_to_message_id=message_id,
+                                    markdown_support=True)
+                    break
 
     def reply_responses(self, bot, update):
         def reply_response(patterns, answer: Union[Text, List], chance=100):
