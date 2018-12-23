@@ -20,7 +20,7 @@ class ForwardTestCase(unittest.TestCase):
     def test_message_from_main_chat(self):
         self.update.message.chat_id = self.chat_id
         
-        self.forward._run(self.bot, self.update)
+        self.forward._forward(self.bot, self.update)
         
         self.bot.forwardMessage.assert_not_called()
         self.bot.sendMessage.assert_not_called()
@@ -30,7 +30,7 @@ class ForwardTestCase(unittest.TestCase):
         self.update.message.chat.title = self.another_chat_title
         self.update.message.chat.type = 'group'
         
-        self.forward._run(self.bot, self.update)
+        self.forward._forward(self.bot, self.update)
         self.bot.forwardMessage.assert_called_once_with(
             message_id=self.update.message.message_id,
             from_chat_id=self.update.message.chat_id, chat_id=self.admin_id)
@@ -44,7 +44,7 @@ class ForwardTestCase(unittest.TestCase):
         self.update.message.chat.type = 'private'
         self.update.message.chat.title = None
         
-        self.forward._run(self.bot, self.update)
+        self.forward._forward(self.bot, self.update)
         self.bot.forwardMessage.assert_called_once_with(
             message_id=self.update.message.message_id,
             from_chat_id=self.update.message.chat_id, chat_id=self.admin_id)

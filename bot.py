@@ -2,8 +2,7 @@ import logging
 import traceback
 
 from telegram import ParseMode, TelegramError
-from telegram.ext import (CommandHandler, Dispatcher, Filters, MessageHandler,
-                          Updater)
+from telegram.ext import CommandHandler, Dispatcher, Updater
 
 from model import init_database
 from modules.admin import Admin
@@ -11,8 +10,7 @@ from modules.block_stickerpack import BlockStickerpack
 from modules.forward import Forward
 from modules.kto_zloy import KtoZloy
 from modules.pay_respect import pay_respect
-from modules.primitive_response import PrimitiveResponse
-from modules.random_reaction import random_reaction
+from modules.reactions import Reactions
 from modules.reply_to_pin import ReplyToPin
 from modules.resolve import resolve
 from modules.statistic import Statistic
@@ -62,9 +60,6 @@ class Bot:
             self._updater.start_polling(poll_interval=1)
     
     def _init_handlers(self):
-        self._updater.dispatcher.add_handler(
-            MessageHandler(Filters.all, random_reaction))
-
         statistic = Statistic(CHAT_ID, ADMIN_ID)
         statistic.add_handlers(self._updater.dispatcher.add_handler)
 
@@ -85,8 +80,8 @@ class Bot:
         admin = Admin(CHAT_ID, ADMIN_ID)
         admin.add_handlers(self._updater.dispatcher.add_handler)
 
-        primitive_response = PrimitiveResponse(CHAT_ID)
-        primitive_response.add_handlers(self._updater.dispatcher.add_handler)
+        reactions = Reactions(CHAT_ID)
+        reactions.add_handlers(self._updater.dispatcher.add_handler)
 
         block_stickerpack = BlockStickerpack(CHAT_ID, ADMIN_ID)
         block_stickerpack.add_handlers(self._updater.dispatcher.add_handler)
