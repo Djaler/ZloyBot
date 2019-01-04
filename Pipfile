@@ -8,12 +8,12 @@ python_version = "3.6"
 
 [packages]
 python-telegram-bot = "*"
-peewee = "==2.10.2"
+peewee = "==3.8.0"
 feedparser = "*"
 python-dateutil = "*"
 python-dotenv = "*"
 supycache = "*"
-psycopg2 = "*"
+psycopg2-binary = "*"
 marshmallow = "*"
 
 [dev-packages]
