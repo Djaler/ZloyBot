@@ -8,7 +8,7 @@ python_version = "3.6"
 
 [packages]
 python-telegram-bot = "*"
-peewee = "==3.8.0"
+peewee = "==3.8.1"
 feedparser = "*"
 python-dateutil = "*"
 python-dotenv = "*"
